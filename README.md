@@ -1,6 +1,5 @@
-# IPL Score Prediction using Machine Learning
 
-This Machine Learning model adapts a Regression Approach to predict the score of the First Inning of an IPL Match.
+
 
 import pandas as pd
 import numpy as np
@@ -29,9 +28,7 @@ sns.displot(ipl_df['total'],kde=False,bins=10)
 plt.title("Runs Distribution")
 
 plt.show()
-# Data Cleaning
-#### Removing Irrelevant Data colunms
-# Names of all columns
+
 ipl_df.columns
 Here, we can see that columns _['mid', 'date', 'venue', 'batsman', 'bowler', 'striker', 'non-striker']_ won't provide any relevant information for our model to train
 irrelevant = ['mid', 'date', 'venue','batsman', 'bowler', 'striker', 'non-striker']
@@ -39,9 +36,9 @@ print(f'Before Removing Irrelevant Columns : {ipl_df.shape}')
 ipl_df = ipl_df.drop(irrelevant, axis=1) # Drop Irrelevant Columns
 print(f'After Removing Irrelevant Columns : {ipl_df.shape}')
 ipl_df.head()
-#### Keeping only Consistent Teams 
 
-# Define Consistent Teams
+
+
 const_teams = ['Kolkata Knight Riders', 'Chennai Super Kings', 'Rajasthan Royals',
               'Mumbai Indians', 'Kings XI Punjab', 'Royal Challengers Bangalore',
               'Delhi Daredevils', 'Sunrisers Hyderabad']
@@ -50,7 +47,7 @@ ipl_df = ipl_df[(ipl_df['bat_team'].isin(const_teams)) & (ipl_df['bowl_team'].is
 print(f'After Removing Irrelevant Columns : {ipl_df.shape}')
 print(f"Consistent Teams : \n{ipl_df['bat_team'].unique()}")
 ipl_df.head()
-#### Remove First 5 Overs of every match
+
 print(f'Before Removing Overs : {ipl_df.shape}')
 ipl_df = ipl_df[ipl_df['overs'] >= 5.0]
 print(f'After Removing Overs : {ipl_df.shape}')
@@ -58,14 +55,12 @@ ipl_df.head()
 Plotting a Correlation Matrix of current data
 from seaborn import heatmap
 heatmap(data=ipl_df.corr(), annot=True)
-# Data Preprocessing and Encoding
-#### Performing Label Encoding
+
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 le = LabelEncoder()
 for col in ['bat_team', 'bowl_team']:
   ipl_df[col] = le.fit_transform(ipl_df[col])
 ipl_df.head()
-#### Performing One Hot Encoding and Column Transformation
 from sklearn.compose import ColumnTransformer
 columnTransformer = ColumnTransformer([('encoder', 
                                         OneHotEncoder(), 
@@ -81,23 +76,22 @@ cols = ['batting_team_Chennai Super Kings', 'batting_team_Delhi Daredevils', 'ba
               'bowling_team_Royal Challengers Bangalore', 'bowling_team_Sunrisers Hyderabad', 'runs', 'wickets', 'overs',
        'runs_last_5', 'wickets_last_5', 'total']
 df = pd.DataFrame(ipl_df, columns=cols)
-# Encoded Data
+
 df.head()
-# Model Building
-## Prepare Train and Test Data
+
 features = df.drop(['total'], axis=1)
 labels = df['total']
 from sklearn.model_selection import train_test_split
 train_features, test_features, train_labels, test_labels = train_test_split(features, labels, test_size=0.20, shuffle=True)
 print(f"Training Set : {train_features.shape}\nTesting Set : {test_features.shape}")
-## ML  Algorithms
+
 models = dict()
-#### 1. Decision Tree Regressor
+
 from sklearn.tree import DecisionTreeRegressor
 tree = DecisionTreeRegressor()
-# Train Model
+
 tree.fit(train_features, train_labels)
-# Evaluate Model
+
 train_score_tree = str(tree.score(train_features, train_labels) * 100)
 test_score_tree = str(tree.score(test_features, test_labels) * 100)
 print(f'Train Score : {train_score_tree[:5]}%\nTest Score : {test_score_tree[:5]}%')
@@ -107,7 +101,7 @@ print("---- Decision Tree Regressor - Model Evaluation ----")
 print("Mean Absolute Error (MAE): {}".format(mae(test_labels, tree.predict(test_features))))
 print("Mean Squared Error (MSE): {}".format(mse(test_labels, tree.predict(test_features))))
 print("Root Mean Squared Error (RMSE): {}".format(np.sqrt(mse(test_labels, tree.predict(test_features)))))
-#### Linear Regression
+
 from sklearn.linear_model import LinearRegression
 linreg = LinearRegression()
 # Train Model
